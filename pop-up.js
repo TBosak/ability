@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "dyslexia-font": "dyslexiaFontEnabled",
     "high-contrast": "highContrastEnabled",
     "toggle-images": "hideImagesEnabled",
+    "letter-spacing": "letterSpacingEnabled",
   };
 
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {

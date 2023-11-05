@@ -24,6 +24,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     case "dyslexiaFontEnabled":
       toggleDyslexiaFont(request.enabled);
       break;
+    case "letterSpacingEnabled":
+      toggleLetterSpacing(request.enabled);
+      break;
     default:
       console.log("Unknown action: " + request.action);
   }
@@ -232,6 +235,23 @@ function toggleDyslexiaFont(enableFont) {
         }
       }
       `;
+  } else {
+    if (styleElement) {
+      styleElement.remove();
+    }
+  }
+}
+
+function toggleLetterSpacing(enabled) {
+  const styleId = 'my-extension-letter-spacing-style';
+  let styleElement = document.getElementById(styleId);
+  if (enabled) {
+    if (!styleElement) {
+      styleElement = document.createElement('style');
+      styleElement.id = styleId;
+      document.head.appendChild(styleElement);
+    }
+    styleElement.textContent = `* { letter-spacing: 0.12em !important; }`; // Set desired letter-spacing value
   } else {
     if (styleElement) {
       styleElement.remove();
