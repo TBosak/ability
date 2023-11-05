@@ -27,6 +27,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     case "letterSpacingEnabled":
       toggleLetterSpacing(request.enabled);
       break;
+    case "dimmerOverlayEnabled":
+      toggleDimmerOverlay(request.enabled);
+      break;
+    case "largeCursorEnabled":
+      toggleLargeCursor(request.enabled);
+      break;
     default:
       console.log("Unknown action: " + request.action);
   }
@@ -273,3 +279,61 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   alert(request.message);
 }
 });
+
+let flashlightOverlay;
+
+function toggleDimmerOverlay(enabled) {
+  if (enabled) {
+    if (!flashlightOverlay) {
+      // Create the dimmer overlay if it doesn't exist
+      flashlightOverlay = document.createElement('div');
+      flashlightOverlay.style.position = 'fixed';
+      flashlightOverlay.style.top = '0';
+      flashlightOverlay.style.left = '0';
+      flashlightOverlay.style.width = '100%';
+      flashlightOverlay.style.height = '100%';
+      flashlightOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'; // Darker for flashlight effect
+      flashlightOverlay.style.zIndex = '99999'; // High z-index to cover the page
+      flashlightOverlay.style.pointerEvents = 'none'; // Allows clicking through the overlay
+      document.body.appendChild(flashlightOverlay);
+
+      // Add mouse move listener to create flashlight effect
+      document.addEventListener('mousemove', updateFlashlightPosition);
+    }
+    flashlightOverlay.style.display = 'block';
+  } else {
+    if (flashlightOverlay) {
+      flashlightOverlay.style.display = 'none';
+      document.removeEventListener('mousemove', updateFlashlightPosition);
+    }
+  }
+}
+
+function updateFlashlightPosition(e) {
+  const radius = 100; // Radius of the flashlight circle
+  const flashlightStyle = `
+    radial-gradient(circle ${radius}px at ${e.clientX}px ${e.clientY}px, 
+    transparent, transparent ${radius}px, rgba(0, 0, 0, 0.7) ${radius + 1}px)
+  `;
+  flashlightOverlay.style.background = flashlightStyle;
+}
+
+function toggleLargeCursor(enabled) {
+  const cursorUrl = chrome.runtime.getURL('assets/cursor.png'); // Path to your PNG cursor image
+  const cursorStyleElement = document.getElementById('large-cursor-style') || createCursorStyleElement();
+
+  if (enabled) {
+    // Enlarge the cursor using the PNG cursor image
+    cursorStyleElement.textContent = `body, body * { cursor: url('${cursorUrl}'), auto !important; }`;
+  } else {
+    // Reset to the default cursor
+    cursorStyleElement.textContent = '';
+  }
+}
+
+function createCursorStyleElement() {
+  const style = document.createElement('style');
+  style.id = 'large-cursor-style';
+  document.head.appendChild(style);
+  return style;
+}

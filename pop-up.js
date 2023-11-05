@@ -19,6 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
     "high-contrast": "highContrastEnabled",
     "toggle-images": "hideImagesEnabled",
     "letter-spacing": "letterSpacingEnabled",
+    "dimmer-overlay": "dimmerOverlayEnabled",
+    "lg-cursor": "largeCursorEnabled",
   };
 
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {

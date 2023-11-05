@@ -38,8 +38,8 @@
       cursor: pointer; /* Cursor on hover */
     }
   </style>
-  <body style="width: 340px">
-    <div class="container">
+  <body style="width: 340px;">
+    <div class="container" style="border:3px solid #d3d3d3;">
         <button type="button" class="btn-close" style="margin-left:95%;margin-top:1px;" aria-label="Close" id="close"></button>
       <div class="row">
         <div id="tts-menu" class="col text-center">
@@ -55,6 +55,7 @@
               step="0.1"
             />
           </div>
+          <br>
           <div>
             <label for="pitch">Pitch:</label>
             <input
@@ -66,6 +67,7 @@
               step="0.1"
             />
           </div>
+          <br>
           <div>
             <label for="volume">Volume:</label>
             <input
@@ -77,6 +79,7 @@
               step="0.1"
             />
           </div>
+          <br>
           <div>
             <label for="voice">Voice:</label>
             <select
@@ -117,6 +120,14 @@
             <div class="form-check form-switch">
                 <input class="form-check-input" type="checkbox" role="switch" id="letter-spacing">
                 <label class="form-check-label" for="letter-spacing" title="Increases spacing between letters">Letter Spacing</label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="dimmer-overlay">
+                <label class="form-check-label" for="dimmer-overlay" title="Applies an overlay to dim unfocused content">Dimmer Overlay</label>
+            </div>
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="lg-cursor">
+                <label class="form-check-label" for="lg-cursor" title="Increases cursor size">Large Cursor</label>
             </div>
          </div>
         </div>
