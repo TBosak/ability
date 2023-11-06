@@ -1,3 +1,5 @@
+let toggleImgListener;
+let hideImages = false;
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   switch (request.action) {
     case "hideImagesEnabled":
@@ -5,8 +7,10 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       toggleImagesVisibility();
       if (hideImages) {
         imageObserver = observeNewElements();
+        toggleImgListener = window.addEventListener('scroll', () => {toggleImagesVisibility()});
       } else if (imageObserver) {
         imageObserver.disconnect();
+        window.removeEventListener('scroll', toggleImgListener);
       }
       break;
     case "highContrastEnabled":
@@ -38,8 +42,6 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 });
 
-let hideImages = false;
-
 function toggleImagesVisibility() {
   const images = document.querySelectorAll("img");
   images.forEach((img) => {
@@ -53,6 +55,7 @@ function toggleImagesVisibility() {
   });
 }
 
+let imageObserver;
 // Function to observe new images added to the document and hide them if needed
 function observeNewElements() {
   imageObserver = new MutationObserver((mutations) => {
@@ -78,8 +81,6 @@ function observeNewElements() {
     subtree: true,
   });
 }
-
-let imageObserver;
 
 function applyHighContrast(state) {
   document.documentElement.style.filter = state
