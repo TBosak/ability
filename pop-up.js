@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "letter-spacing": "letterSpacingEnabled",
     "dimmer-overlay": "dimmerOverlayEnabled",
     "lg-cursor": "largeCursorEnabled",
+    "autocomplete": "autocompleteEnabled",
 // ... other actions for additional features ...
   };
 

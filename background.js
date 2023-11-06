@@ -113,6 +113,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
                         letterSpacingEnabled: 'letterSpacingEnabled',
                         dimmerOverlayEnabled: 'dimmerOverlayEnabled',
                         largeCursorEnabled: 'largeCursorEnabled',
+                        autocompleteEnabled: 'autocompleteEnabled',
                         // ... other actions for additional features ...
                     };
                     const action = actions[stateKey];

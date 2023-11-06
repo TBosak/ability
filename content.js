@@ -7,10 +7,12 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       toggleImagesVisibility();
       if (hideImages) {
         imageObserver = observeNewElements();
-        toggleImgListener = window.addEventListener('scroll', () => {toggleImagesVisibility()});
+        toggleImgListener = window.addEventListener("scroll", () => {
+          toggleImagesVisibility();
+        });
       } else if (imageObserver) {
         imageObserver.disconnect();
-        window.removeEventListener('scroll', toggleImgListener);
+        window.removeEventListener("scroll", toggleImgListener);
       }
       break;
     case "highContrastEnabled":
@@ -37,10 +39,23 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     case "largeCursorEnabled":
       toggleLargeCursor(request.enabled);
       break;
+    case "autocompleteEnabled":
+      enableAutocomplete();
+      break;
     default:
       console.log("Unknown action: " + request.action);
   }
 });
+
+let wordList = [];
+
+fetch(chrome.runtime.getURL("assets/words.json"))
+  .then((response) => response.json())
+  .then((json) => {
+    wordList = Object.keys(json);
+    console.log(wordList);
+  })
+  .catch((error) => console.error("Error loading word list:", error));
 
 function toggleImagesVisibility() {
   const images = document.querySelectorAll("img");
@@ -160,7 +175,6 @@ let focusLine = null;
 let focusTriangle = null;
 
 function focusLineEnabled(enabled) {
-
   if (enabled) {
     if (!focusLine) {
       // Create the focus line
@@ -179,15 +193,15 @@ function focusLineEnabled(enabled) {
       focusTriangle.style.position = "fixed";
       focusTriangle.style.width = "0";
       focusTriangle.style.height = "0";
-      focusTriangle.style.borderLeft = "10px solid transparent";  // Adjust size as needed
+      focusTriangle.style.borderLeft = "10px solid transparent"; // Adjust size as needed
       focusTriangle.style.borderRight = "10px solid transparent"; // Adjust size as needed
-      focusTriangle.style.borderBottom = "10px solid blue";       // Adjust color and size as needed
+      focusTriangle.style.borderBottom = "10px solid blue"; // Adjust color and size as needed
       focusTriangle.style.zIndex = "10000"; // Should be above the line
       focusTriangle.style.pointerEvents = "none"; // Ignore mouse events
       document.body.appendChild(focusTriangle);
     }
     // Event listener to update position of focus line and triangle
-    document.addEventListener("mousemove", function(e) {
+    document.addEventListener("mousemove", function (e) {
       updateFocusLine(e, focusLine, focusTriangle);
     });
   } else {
@@ -205,16 +219,18 @@ function focusLineEnabled(enabled) {
 }
 
 function updateFocusLine(e, focusLine, focusTriangle) {
-  // Use clientY for vertical position to avoid issues with scrolling
-  const yPosition = e.clientY;
-  
-  // Update focus line position to follow the mouse cursor
-  focusLine.style.top = `${yPosition}px`;
-  
-  // Update triangle position
-  // The '- 10' is to account for the height of the triangle to center it vertically around the cursor
-  focusTriangle.style.left = `${e.clientX - 10}px`; // Adjust '- 10' if the size of the triangle changes
-  focusTriangle.style.top = `${yPosition - 10}px`; // Keep the triangle centered with the cursor
+  if (focusLine !== null && focusTriangle !== null) {
+    // Use clientY for vertical position to avoid issues with scrolling
+    const yPosition = e.clientY;
+
+    // Update focus line position to follow the mouse cursor
+    focusLine.style.top = `${yPosition}px`;
+
+    // Update triangle position
+    // The '- 10' is to account for the height of the triangle to center it vertically around the cursor
+    focusTriangle.style.left = `${e.clientX - 10}px`; // Adjust '- 10' if the size of the triangle changes
+    focusTriangle.style.top = `${yPosition - 10}px`; // Keep the triangle centered with the cursor
+  }
 }
 
 function toggleDyslexiaFont(enableFont) {
@@ -250,11 +266,11 @@ function toggleDyslexiaFont(enableFont) {
 }
 
 function toggleLetterSpacing(enabled) {
-  const styleId = 'my-extension-letter-spacing-style';
+  const styleId = "my-extension-letter-spacing-style";
   let styleElement = document.getElementById(styleId);
   if (enabled) {
     if (!styleElement) {
-      styleElement = document.createElement('style');
+      styleElement = document.createElement("style");
       styleElement.id = styleId;
       document.head.appendChild(styleElement);
     }
@@ -266,19 +282,18 @@ function toggleLetterSpacing(enabled) {
   }
 }
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.action === 'showDefinition') {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if (request.action === "showDefinition") {
     const selection = window.getSelection();
     const range = selection.getRangeAt(0);
-    const span = document.createElement('span');
+    const span = document.createElement("span");
     span.title = request.definition;
     range.surroundContents(span);
     selection.removeAllRanges();
     selection.addRange(range);
+  } else if (request.action === "alertUser" && request.message) {
+    alert(request.message);
   }
-  else if (request.action === 'alertUser' && request.message) {
-  alert(request.message);
-}
 });
 
 let flashlightOverlay;
@@ -287,25 +302,25 @@ function toggleDimmerOverlay(enabled) {
   if (enabled) {
     if (!flashlightOverlay) {
       // Create the dimmer overlay if it doesn't exist
-      flashlightOverlay = document.createElement('div');
-      flashlightOverlay.style.position = 'fixed';
-      flashlightOverlay.style.top = '0';
-      flashlightOverlay.style.left = '0';
-      flashlightOverlay.style.width = '100%';
-      flashlightOverlay.style.height = '100%';
-      flashlightOverlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)'; // Darker for flashlight effect
-      flashlightOverlay.style.zIndex = '99999'; // High z-index to cover the page
-      flashlightOverlay.style.pointerEvents = 'none'; // Allows clicking through the overlay
+      flashlightOverlay = document.createElement("div");
+      flashlightOverlay.style.position = "fixed";
+      flashlightOverlay.style.top = "0";
+      flashlightOverlay.style.left = "0";
+      flashlightOverlay.style.width = "100%";
+      flashlightOverlay.style.height = "100%";
+      flashlightOverlay.style.backgroundColor = "rgba(0, 0, 0, 0.7)"; // Darker for flashlight effect
+      flashlightOverlay.style.zIndex = "99999"; // High z-index to cover the page
+      flashlightOverlay.style.pointerEvents = "none"; // Allows clicking through the overlay
       document.body.appendChild(flashlightOverlay);
 
       // Add mouse move listener to create flashlight effect
-      document.addEventListener('mousemove', updateFlashlightPosition);
+      document.addEventListener("mousemove", updateFlashlightPosition);
     }
-    flashlightOverlay.style.display = 'block';
+    flashlightOverlay.style.display = "block";
   } else {
     if (flashlightOverlay) {
-      flashlightOverlay.style.display = 'none';
-      document.removeEventListener('mousemove', updateFlashlightPosition);
+      flashlightOverlay.style.display = "none";
+      document.removeEventListener("mousemove", updateFlashlightPosition);
     }
   }
 }
@@ -320,21 +335,103 @@ function updateFlashlightPosition(e) {
 }
 
 function toggleLargeCursor(enabled) {
-  const cursorUrl = chrome.runtime.getURL('assets/cursor.png'); // Path to your PNG cursor image
-  const cursorStyleElement = document.getElementById('large-cursor-style') || createCursorStyleElement();
+  const cursorUrl = chrome.runtime.getURL("assets/cursor.png"); // Path to your PNG cursor image
+  const cursorStyleElement =
+    document.getElementById("large-cursor-style") || createCursorStyleElement();
 
   if (enabled) {
     // Enlarge the cursor using the PNG cursor image
     cursorStyleElement.textContent = `body, body * { cursor: url('${cursorUrl}'), auto !important; }`;
   } else {
     // Reset to the default cursor
-    cursorStyleElement.textContent = '';
+    cursorStyleElement.textContent = "";
   }
 }
 
 function createCursorStyleElement() {
-  const style = document.createElement('style');
-  style.id = 'large-cursor-style';
+  const style = document.createElement("style");
+  style.id = "large-cursor-style";
   document.head.appendChild(style);
   return style;
+}
+
+function createAutocomplete(inputElement) {
+  let autoCompleteDiv = document.createElement("div");
+  autoCompleteDiv.className = "autocomplete-items";
+  // Position the autocomplete items below the input element
+  autoCompleteDiv.style.position = "absolute";
+  autoCompleteDiv.style.border = "1px solid #d4d4d4";
+  autoCompleteDiv.style.backgroundColor = "#fff";
+  autoCompleteDiv.style.zIndex = "99";
+  autoCompleteDiv.style.top = `${
+    inputElement.offsetTop + inputElement.offsetHeight
+  }px`;
+  autoCompleteDiv.style.left = `${inputElement.offsetLeft}px`;
+  autoCompleteDiv.style.width = `${inputElement.offsetWidth}px`;
+
+  inputElement.parentNode.appendChild(autoCompleteDiv);
+
+  inputElement.addEventListener("input", function () {
+    // Get the current word the user is typing (the last word in the input)
+    let currentInput = this.value;
+    let currentWords = currentInput.split(/\s+/); // Split the input into words
+    let currentWord = currentWords[currentWords.length - 1]; // Get the last word
+    // Clear any existing autocomplete items
+    while (autoCompleteDiv.firstChild) {
+      autoCompleteDiv.removeChild(autoCompleteDiv.firstChild);
+    }
+    if (!currentWord) return false;
+    // Filter the wordList based on the current word
+    let matchedWords = wordList.filter(
+      (word) =>
+        word.substr(0, currentWord.length).toUpperCase() ===
+        currentWord.toUpperCase()
+    );
+    // Sort the matched words by length
+    // Sort the matched words by length, and then alphabetically for words of the same length
+    matchedWords.sort((a, b) => {
+      if (a.length === b.length) {
+        return a.localeCompare(b); // Alphabetical order for words of the same length
+      }
+      return a.length - b.length; // Shortest words first
+    }); // Limit the number of suggestions
+    matchedWords.slice(0, 5).forEach((matchedWord) => {
+      // Create a DIV element for each matching element
+      let itemDiv = document.createElement("div");
+      // Make the matching letters bold
+      itemDiv.innerHTML = `<strong>${matchedWord.substr(
+        0,
+        currentWord.length
+      )}</strong>${matchedWord.substr(currentWord.length)}`;
+      itemDiv.addEventListener("click", function () {
+        // Replace the last word with the selected word from autocomplete suggestions
+        currentWords[currentWords.length - 1] = matchedWord;
+        inputElement.value = currentWords.join(" ") + " "; // Add a space after the inserted word
+        // Clear the items
+        while (autoCompleteDiv.firstChild) {
+          autoCompleteDiv.removeChild(autoCompleteDiv.firstChild);
+        }
+      });
+      autoCompleteDiv.appendChild(itemDiv);
+    });
+  });
+
+  // Close the list when the user clicks elsewhere
+  document.addEventListener("click", function (e) {
+    if (e.target !== inputElement && e.target.parentNode !== autoCompleteDiv) {
+      while (autoCompleteDiv.firstChild) {
+        autoCompleteDiv.removeChild(autoCompleteDiv.firstChild);
+      }
+    }
+    e.stopPropagation(); // Stop the click event from closing the div prematurely
+  });
+}
+
+// Query all text inputs and attach the autocomplete
+function enableAutocomplete() {
+  document
+    .querySelectorAll('input[type="text"]:not([autocomplete="on"])')
+    .forEach((inputElement) => {
+      createAutocomplete(inputElement);
+    });
 }
