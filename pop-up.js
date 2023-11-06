@@ -19,18 +19,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // ... other actions for additional features ...
   };
 
-  // chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-  //   chrome.scripting.executeScript(
-  //     {
-  //       target: { tabId: tabs[0].id },
-  //       files: ["content.js"],
-  //     },
-  //     () => {
-  //       // Once the content script is injected, ask for the current state
-  //     }
-  //   );
-  // });
-
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const currentTabId = tabs[0].id;
 
