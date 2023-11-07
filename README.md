@@ -1,6 +1,6 @@
-# Accessible Web Extension
+# Ability
 
-Accessible Web is a Chrome extension designed to enhance web accessibility for users with different needs. It provides a range of features including Text-to-Speech (TTS), image hiding, high contrast mode, dyslexia-friendly fonts, and more.
+Ability is a Chrome extension designed to enhance web accessibility for users with different needs. It provides a range of features including Text-to-Speech (TTS), image hiding, high contrast mode, dyslexia-friendly fonts, and more.
 
 ## Features
 
