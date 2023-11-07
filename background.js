@@ -2,7 +2,7 @@
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
         id: "speak-selected-text",
-        title: "Speak",
+        title: "Speak Selection",
         contexts: ["selection"],
     });
 
@@ -14,9 +14,15 @@ chrome.runtime.onInstalled.addListener(() => {
 
     chrome.contextMenus.create({
         id: 'define',
-        title: 'Define',
+        title: 'Define Selection',
         contexts: ['selection']
     });
+
+    chrome.contextMenus.create({
+        id: 'focused-reading',
+        title: 'Apply Focused Reading',
+        contexts: ['selection']
+      });
 });
 
 // Handle context menu item clicks
@@ -67,7 +73,11 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
                 });
             }
         }
-    }
+    } else if (info.menuItemId === 'focused-reading') {
+        chrome.tabs.sendMessage(tab.id, {
+          action: 'applyFocusedReading'
+        });
+      }
 });
 
 // Inject speech-to-text function into active tab
