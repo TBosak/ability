@@ -42,8 +42,8 @@ After opening the extension menu, adjust the TTS settings or toggle any of the a
 
 ## Possible Upcoming Features
 
-- **Image Magnifier🔎**
-- **Focus**ed **Read**ing
+- **~~Image Magnifier🔎~~**
+- ~~**~~Focus~~**~~ed~~ **~~Read~~**ing~~
 - **User Profiles**
 - **Webgazer👀Tracking?**
 

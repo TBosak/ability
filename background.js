@@ -23,6 +23,12 @@ chrome.runtime.onInstalled.addListener(() => {
         title: 'Apply Focused Reading',
         contexts: ['selection']
       });
+
+      chrome.contextMenus.create({
+        id: 'magnify-image',
+        title: 'Magnify',
+        contexts: ['image'],
+      });
 });
 
 // Handle context menu item clicks
@@ -76,6 +82,12 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     } else if (info.menuItemId === 'focused-reading') {
         chrome.tabs.sendMessage(tab.id, {
           action: 'applyFocusedReading'
+        });
+      }
+      else if (info.menuItemId === 'magnify-image') {
+        chrome.tabs.sendMessage(tab.id, {
+          action: 'openMagnifiedImage',
+          srcUrl: info.srcUrl
         });
       }
 });
