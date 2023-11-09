@@ -3,6 +3,42 @@
 
 <head></head>
 <style>
+  body{
+    font-family: sans-serif;
+    background-color: whitesmoke;
+  }
+
+  .container {
+    border: 3px solid #d3d3d3;
+    background-color: whitesmoke;
+    border-radius: 0 0 10px 10px; /* Rounded edges only at the bottom */
+    box-shadow:
+      inset 2px 2px 5px rgba(255, 255, 255, 0.8), /* Top left white shadow */
+      inset -2px -2px 5px rgba(0, 0, 0, 0.2); /* Bottom right dark shadow */
+    overflow: hidden; /* Ensures the content respects the border radius */
+    /* Rest of your styles */
+  }
+
+  .header{
+    background-color: #d3d3d3;
+    margin-left: -12px;
+    margin-right: -12px;
+    position: relative; /* For absolute positioning of the close button */
+  }
+
+  .title{
+    margin-bottom: -1em;
+    margin: 0;
+    line-height: 1.5;
+    color: white; /* Set title color to white */
+    text-shadow: 
+      -1px -1px 0 #000,  
+       1px -1px 0 #000,
+       -1px 1px 0 #000,
+        1px 1px 0 #000;
+  }
+  
+
   [type="range"] {
     -webkit-appearance: none;
     appearance: none;
@@ -35,13 +71,23 @@
     background: #0d6efd;
     border-radius: 50%;
     cursor: pointer;
+  }  
+
+  .btn-close {
+    position: absolute;
+    right: 8px; /* Adjust spacing as needed */
+    top: 50%;
+    transform: translateY(-50%);
   }
+  
 </style>
 
 <body style="width: 340px;">
-  <div class="container" style="border:3px solid #d3d3d3;">
-    <button type="button" class="btn-close" style="margin-left:95%;margin-top:1px;" aria-label="Close"
-      id="close"></button>
+  <div class="container">
+    <div class="header d-flex justify-content-between align-items-center p-2">
+      <h1 class="title mb-0 text-center flex-grow-1">Ability</h1>
+      <button type="button" class="btn-close" aria-label="Close" id="close"></button>
+    </div>
     <div class="row">
       <div id="tts-menu" class="col text-center">
         <h1>TTS</h1>
