@@ -2,7 +2,7 @@
     "manifest_version": 3,
     "name": "Ability",
     "description": "Ability is a browser extension that helps people with varying degrees of ability have more control over their browsing experience.",
-    "version": "1.0",
+    "version": "1.1",
     "permissions": ["contextMenus", "tts", "storage", "scripting", "tabs"],
     "action": {
       "default_icon": {
