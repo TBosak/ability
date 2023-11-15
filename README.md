@@ -23,6 +23,8 @@ Right-click to access the following options:
 - **Speak:** Read aloud the selected text.
 - **Speech-To-Text:** Convert speech into text in text inputs.
 - **Define:** Look up definitions for the selected word.
+- **Image Magnifier:** Get a closer look at an image.
+- **Focused Reading:** Bolds parts of selected text for an experience similar to Bionic Reading.
 
 ## Installation
 
