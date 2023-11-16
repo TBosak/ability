@@ -57,11 +57,12 @@ api.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 let wordList = [];
 
-fetch(api.runtime.getURL("assets/words.json"))
-  .then((response) => response.json())
-  .then((json) => {
-    wordList = Object.keys(json);
-    console.log(wordList);
+let words1 = fetch(api.runtime.getURL("assets/words1.json")).then(r => r.json());
+let words2 = fetch(api.runtime.getURL("assets/words2.json")).then(r => r.json());
+
+Promise.all([words1, words2])
+  .then(([words1Json, words2Json]) => {
+    wordList = words1Json.concat(words2Json); // Combine the two arrays
   })
   .catch((error) => console.error("Error loading word list:", error));
 
