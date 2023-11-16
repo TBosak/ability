@@ -1,3 +1,5 @@
+const api = chrome || browser || window;
+
 document.addEventListener("DOMContentLoaded", () => {
   const rateInput = document.getElementById("rate");
   const pitchInput = document.getElementById("pitch");
@@ -20,13 +22,13 @@ document.addEventListener("DOMContentLoaded", () => {
 // ... other actions for additional features ...
   };
 
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  api.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const currentTabId = tabs[0].id;
 
     // Initialize the state of each checkbox based on stored values
     Object.keys(toggles).forEach((toggleId) => {
       const stateKey = toggles[toggleId];
-      chrome.storage.local.get({ [stateKey]: {} }, function (result) {
+      api.storage.local.get({ [stateKey]: {} }, function (result) {
         const tabState = result[stateKey][currentTabId];
         document.getElementById(toggleId).checked = !!tabState;
       });
@@ -36,13 +38,13 @@ document.addEventListener("DOMContentLoaded", () => {
     Object.entries(toggles).forEach(([toggleId, stateKey]) => {
       const checkbox = document.getElementById(toggleId);
       checkbox.addEventListener("change", function () {
-        chrome.storage.local.get({ [stateKey]: {} }, function (result) {
+        api.storage.local.get({ [stateKey]: {} }, function (result) {
           const tabState = result[stateKey] || {};
           tabState[currentTabId] = checkbox.checked;
-          chrome.storage.local.set({ [stateKey]: tabState });
+          api.storage.local.set({ [stateKey]: tabState });
         });
         // Send the state to the content script
-        chrome.tabs.sendMessage(currentTabId, {
+        api.tabs.sendMessage(currentTabId, {
           action: stateKey,
           enabled: checkbox.checked,
         });
@@ -50,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
   // Load any previously saved settings and update the UI accordingly
-  chrome.storage.local.get(["rate", "pitch", "volume", "voice"], (settings) => {
+  api.storage.local.get(["rate", "pitch", "volume", "voice"], (settings) => {
     if (settings.rate) rateInput.value = settings.rate;
     if (settings.pitch) pitchInput.value = settings.pitch;
     if (settings.volume) volumeInput.value = settings.volume;
@@ -59,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Function to populate the voice selection dropdown
   function populateVoices() {
-    chrome.tts.getVoices((voices) => {
+    api.tts.getVoices((voices) => {
       voiceSelect.innerHTML = ""; // Clear existing options
       voices.forEach((voice) => {
         const option = document.createElement("option");
@@ -68,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
         voiceSelect.appendChild(option);
       });
       // Set the previously selected voice if it exists
-      chrome.storage.local.get("voice", (data) => {
+      api.storage.local.get("voice", (data) => {
         if (data.voice) {
           voiceSelect.value = data.voice;
         }
@@ -81,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Save button event listener
   saveButton.addEventListener("click", () => {
-    chrome.storage.local.set(
+    api.storage.local.set(
       {
         rate: parseFloat(rateInput.value),
         pitch: parseFloat(pitchInput.value),

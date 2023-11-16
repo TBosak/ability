@@ -1,6 +1,8 @@
+const api = chrome || browser || window;
+
 let toggleImgListener;
 let hideImages = false;
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+api.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   switch (request.action) {
     case "hideImagesEnabled":
       hideImages = request.enabled;
@@ -55,7 +57,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 let wordList = [];
 
-fetch(chrome.runtime.getURL("assets/words.json"))
+fetch(api.runtime.getURL("assets/words.json"))
   .then((response) => response.json())
   .then((json) => {
     wordList = Object.keys(json);
@@ -316,7 +318,7 @@ function toggleDyslexiaFont(enableFont) {
     styleElement.textContent = `
         @font-face {
           font-family: 'OpenDyslexic';
-          src: url('${chrome.runtime.getURL(
+          src: url('${api.runtime.getURL(
             "assets/OpenDyslexic.otf"
           )}') format('opentype');
         }
@@ -350,7 +352,7 @@ function toggleLetterSpacing(enabled) {
   }
 }
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+api.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.action === "showDefinition") {
     const selection = window.getSelection();
     const range = selection.getRangeAt(0);
@@ -403,7 +405,7 @@ function updateFlashlightPosition(e) {
 }
 
 function toggleLargeCursor(enabled) {
-  const cursorUrl = chrome.runtime.getURL("assets/cursor.png"); // Path to your PNG cursor image
+  const cursorUrl = api.runtime.getURL("assets/cursor.png"); // Path to your PNG cursor image
   const cursorStyleElement =
     document.getElementById("large-cursor-style") || createCursorStyleElement();
 

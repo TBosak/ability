@@ -1,30 +1,32 @@
 // Create context menu items
-chrome.runtime.onInstalled.addListener(() => {
-    chrome.contextMenus.create({
+const api = chrome || browser || window;
+
+api.runtime.onInstalled.addListener(() => {
+    api.contextMenus.create({
         id: "speak-selected-text",
         title: "Speak Selection",
         contexts: ["selection"],
     });
 
-    chrome.contextMenus.create({
+    api.contextMenus.create({
         id: "speech-to-text",
         title: "Speech-To-Text",
         contexts: ["editable"],
     });
 
-    chrome.contextMenus.create({
+    api.contextMenus.create({
         id: 'define',
         title: 'Define Selection',
         contexts: ['selection']
     });
 
-    chrome.contextMenus.create({
+    api.contextMenus.create({
         id: 'focused-reading',
         title: 'Apply Focused Reading',
         contexts: ['selection']
       });
 
-      chrome.contextMenus.create({
+      api.contextMenus.create({
         id: 'magnify-image',
         title: 'Magnify',
         contexts: ['image'],
@@ -32,10 +34,10 @@ chrome.runtime.onInstalled.addListener(() => {
 });
 
 // Handle context menu item clicks
-chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+api.contextMenus.onClicked.addListener(async (info, tab) => {
     if (info.menuItemId === "speak-selected-text") {
-        const { rate = 1, pitch = 1, volume = 1, voice = "native" } = await chrome.storage.local.get(["rate", "pitch", "volume", "voice"]);
-        chrome.tts.speak(info.selectionText, {
+        const { rate = 1, pitch = 1, volume = 1, voice = "native" } = await api.storage.local.get(["rate", "pitch", "volume", "voice"]);
+        api.tts.speak(info.selectionText, {
             rate,
             pitch,
             volume,
@@ -47,15 +49,17 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
             },
         });
     } else if (info.menuItemId === "speech-to-text") {
-        chrome.scripting.executeScript({
+        chrome ? api.scripting.executeScript({
             target: { tabId: tab.id },
             function: startSpeechToText,
+        }) : api.tabs.executeScript(tab.id, {
+            code: `(${startSpeechToText.toString()})()`,
         });
     } else if (info.menuItemId === 'define' && info.selectionText) {
         const query = info.selectionText.trim();
         if (/\s/.test(query)) {
             // If the selection contains space, it might be more than one word
-            chrome.tabs.sendMessage(tab.id, {
+            api.tabs.sendMessage(tab.id, {
                 action: 'alertUser',
                 message: 'Please select only a single word to define.'
             });
@@ -66,26 +70,26 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
                 const definitions = await response.json();
                 if (definitions.length > 0 && definitions[0].meanings.length > 0) {
                     const definition = definitions[0].meanings[0].definitions[0].definition;
-                    chrome.tabs.sendMessage(tab.id, {
+                    api.tabs.sendMessage(tab.id, {
                         action: 'showDefinition',
                         definition,
                         word: query
                     });
                 }
             } catch (error) {
-                chrome.tabs.sendMessage(tab.id, {
+                api.tabs.sendMessage(tab.id, {
                     action: 'alertUser',
                     message: 'An error occurred while fetching the definition.'
                 });
             }
         }
     } else if (info.menuItemId === 'focused-reading') {
-        chrome.tabs.sendMessage(tab.id, {
+        api.tabs.sendMessage(tab.id, {
           action: 'applyFocusedReading'
         });
       }
       else if (info.menuItemId === 'magnify-image') {
-        chrome.tabs.sendMessage(tab.id, {
+        api.tabs.sendMessage(tab.id, {
           action: 'openMagnifiedImage',
           srcUrl: info.srcUrl
         });
@@ -119,9 +123,9 @@ function startSpeechToText() {
 }
 
 // Toggle features on tab update
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+api.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     if (changeInfo.status === 'complete') {
-        chrome.storage.local.get(null, function(allStates) {
+        api.storage.local.get(null, function(allStates) {
             Object.keys(allStates).forEach((stateKey) => {
                 const isEnabled = allStates[stateKey]?.[tabId];
                 if (isEnabled) {
@@ -140,7 +144,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
                     };
                     const action = actions[stateKey];
                     if (action) {
-                        chrome.tabs.sendMessage(tabId, {
+                        api.tabs.sendMessage(tabId, {
                             action,
                             enabled: true
                         });
