@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "dimmer-overlay": "dimmerOverlayEnabled",
     "lg-cursor": "largeCursorEnabled",
     "autocomplete": "autocompleteEnabled",
-// ... other actions for additional features ...
+    // ... other actions for additional features ...
   };
 
   api.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -60,26 +60,44 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // Function to populate the voice selection dropdown
-  function populateVoices() {
-    api.tts.getVoices((voices) => {
+  async function populateVoices() {
+    if (typeof chrome !== "undefined" && chrome.tts) {
+      // For Chrome
+      api.tts.getVoices((voices) => {
+        voiceSelect.innerHTML = ""; // Clear existing options
+        voices.forEach((voice) => {
+          const option = document.createElement("option");
+          option.textContent = voice.voiceName;
+          option.value = voice.voiceName;
+          voiceSelect.appendChild(option);
+        });
+      });
+    } else {
+      // For Firefox and others
+      const voices = speechSynthesis.getVoices();
       voiceSelect.innerHTML = ""; // Clear existing options
       voices.forEach((voice) => {
         const option = document.createElement("option");
-        option.textContent = voice.voiceName;
-        option.value = voice.voiceName;
+        option.textContent = voice.name;
+        option.value = voice.name;
         voiceSelect.appendChild(option);
       });
-      // Set the previously selected voice if it exists
-      api.storage.local.get("voice", (data) => {
-        if (data.voice) {
-          voiceSelect.value = data.voice;
-        }
-      });
+    }
+    // Set the previously selected voice if it exists
+    api.storage.local.get("voice", (data) => {
+      if (data.voice) {
+        voiceSelect.value = data.voice;
+      }
     });
   }
 
   // Initial population of voices
   populateVoices();
+
+  if (typeof chrome === "undefined" || !chrome.tts) {
+    // Use onvoiceschanged event for browsers like Firefox
+    speechSynthesis.onvoiceschanged = populateVoices;
+  }
 
   // Save button event listener
   saveButton.addEventListener("click", () => {
