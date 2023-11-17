@@ -2,17 +2,20 @@
 const api = chrome || browser || window;
 
 api.runtime.onInstalled.addListener(() => {
-  api.contextMenus.create({
-    id: "speak-selected-text",
-    title: "Speak Selection",
-    contexts: ["selection"],
-  });
 
-  api.contextMenus.create({
-    id: "speech-to-text",
-    title: "Speech-To-Text",
-    contexts: ["editable"],
-  });
+    api.contextMenus.create({
+      id: "speak-selected-text",
+      title: "Speak Selection",
+      contexts: ["selection"],
+    });
+
+  if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+    api.contextMenus.create({
+      id: "speech-to-text",
+      title: "Speech-To-Text",
+      contexts: ["editable"],
+    });
+  }
 
   api.contextMenus.create({
     id: "define",
@@ -36,40 +39,46 @@ api.runtime.onInstalled.addListener(() => {
 // Handle context menu item clicks
 api.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === "speak-selected-text") {
-      const settings = await api.storage.local.get(["rate", "pitch", "volume", "voice"]);
-      const { rate = 1, pitch = 1, volume = 1, voice = "native" } = settings;
-  
-      const isChrome = typeof chrome !== "undefined" && !!chrome.tts;
-  
-      if (isChrome) {
-        // Use chrome.tts if the browser is Chrome
-        chrome.tts.speak(info.selectionText, {
-          rate,
-          pitch,
-          volume,
-          voiceName: voice,
-          onEvent: function (event) {
-            if (event.type === "error") {
-              console.error("TTS Error: ", event.errorMessage);
-            }
-          },
-        });
-      } else {
-        // Use Web Speech API for other browsers
-        let utterance = new SpeechSynthesisUtterance(info.selectionText);
-        utterance.rate = rate;
-        utterance.pitch = pitch;
-        utterance.volume = volume;
-  
-        // Set the voice if available
-        const voices = speechSynthesis.getVoices();
-        const selectedVoice = voices.find(v => v.name === voice);
-        if (selectedVoice) {
-          utterance.voice = selectedVoice;
-        }
-  
-        speechSynthesis.speak(utterance);
+    const settings = await api.storage.local.get([
+      "rate",
+      "pitch",
+      "volume",
+      "voice",
+    ]);
+    const { rate = 1, pitch = 1, volume = 1, voice = "native" } = settings;
+
+    const isChrome = typeof chrome !== "undefined" && !!chrome.tts;
+
+    if (isChrome) {
+      // Use chrome.tts if the browser is Chrome
+      chrome.tts.speak(info.selectionText, {
+        rate,
+        pitch,
+        volume,
+        voiceName: voice,
+        onEvent: function (event) {
+          if (event.type === "error") {
+            console.error("TTS Error: ", event.errorMessage);
+          }
+        },
+      });
+    } else {
+      // Use Web Speech API for other browsers
+      const speech = window.speechSynthesis || speechSynthesis;
+      let utterance = new SpeechSynthesisUtterance(info.selectionText);
+      utterance.rate = rate;
+      utterance.pitch = pitch;
+      utterance.volume = volume;
+
+      // Set the voice if available
+      const voices = speech.getVoices();
+      const selectedVoice = voices.find((v) => v.name === voice);
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
       }
+
+      speech.speak(utterance);
+    }
   } else if (info.menuItemId === "speech-to-text") {
     chrome
       ? api.scripting.executeScript({
