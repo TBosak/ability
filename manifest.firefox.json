@@ -1,0 +1,35 @@
+{
+  "manifest_version": 2,
+  "name": "Ability",
+  "description": "Ability is a browser extension that helps people with varying degrees of ability have more control over their browsing experience.",
+  "version": "1.1",
+  "permissions": ["contextMenus", "storage", "activeTab"],
+  "browser_action": {
+    "default_icon": {
+      "16": "assets/16.png",
+      "32": "assets/32.png",
+      "128": "assets/128.png"
+    },
+    "default_popup": "pop-up.html"
+  },
+  "icons": {
+    "16": "assets/16.png",
+    "32": "assets/32.png",
+    "128": "assets/128.png"
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    "assets/OpenDyslexic.otf",
+    "assets/cursor.png",
+    "assets/words1.json",
+    "assets/words2.json"
+  ]
+}
