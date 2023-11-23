@@ -10,7 +10,7 @@
       "32": "assets/32.png",
       "128": "assets/128.png"
     },
-    "default_popup": "pop-up.html"
+    "default_popup": "pop-up.firefox.html"
   },
   "icons": {
     "16": "assets/16.png",
