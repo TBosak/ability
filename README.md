@@ -1,6 +1,6 @@
 # Ability
 
-Ability is a Chrome extension designed to enhance web accessibility for users with different needs. It is a comprehensive assistive suite, providing a range of features including text-to-speech, speech-to-text, image hiding, high contrast mode, dyslexia-friendly font injection, etc. This collection of tools was designed keeping in mind individuals with sensory sensitivities, dyslexia, epilepsy, visual & mobility impairments, and intellectual disabilities. The features will continue to grow as more needs are discovered. See the list of upcoming features for a look at what's coming down the pipeline.
+Ability is a Chrome extension designed to enhance web accessibility for users with different needs. It is a comprehensive collection of assistive tools, providing a range of features including text-to-speech, speech-to-text, image hiding, high contrast mode, dyslexia-friendly font injection, etc. This collection of tools was designed keeping in mind individuals with sensory sensitivities, dyslexia, epilepsy, visual & mobility impairments, and intellectual disabilities. The features will continue to grow as more needs are discovered. See the list of upcoming features for a look at what's coming down the pipeline.
 
 ## Features
 
