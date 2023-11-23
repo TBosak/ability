@@ -3,6 +3,7 @@ const api = chrome || browser || window;
 
 api.runtime.onInstalled.addListener(() => {
 
+  if(chrome.tts){
     api.contextMenus.create({
       id: "speak-selected-text",
       title: "Speak Selection",
@@ -16,6 +17,7 @@ api.runtime.onInstalled.addListener(() => {
       contexts: ["editable"],
     });
   }
+}
 
   api.contextMenus.create({
     id: "define",
