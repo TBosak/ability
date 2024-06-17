@@ -1,5 +1,10 @@
+import { pipeline, env } from '@xenova/transformers';
 let toggleImgListener;
 let hideImages = false;
+
+env.allowLocalModels = false;
+env.backends.onnx.wasm.numThreads = 1;
+
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   switch (request.action) {
     case "hideImagesEnabled":
@@ -47,6 +52,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       break;
     case "openMagnifiedImage":
       openMagnifiedImage(request.srcUrl);
+      break;
+    case "readImage":
+      readImage(request.srcUrl);
       break;
     default:
       console.log("Unknown action: " + request.action);
@@ -535,6 +543,61 @@ function splitWord(word) {
   const wordLength = word.length;
   let splitIndex = wordLength <= 4 ? 1 : 4;
   return [word.substring(0, splitIndex), word.substring(splitIndex)];
+}
+
+  // Add loading overlay
+  const createLoadingOverlay = () => {
+    const overlay = document.createElement('div');
+    overlay.id = 'loadingOverlay';
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    overlay.style.display = 'flex';
+    overlay.style.alignItems = 'center';
+    overlay.style.justifyContent = 'center';
+    overlay.style.zIndex = '10000';
+
+    const spinner = document.createElement('div');
+    spinner.style.border = '16px solid #f3f3f3';
+    spinner.style.borderTop = '16px solid #3498db';
+    spinner.style.borderRadius = '50%';
+    spinner.style.width = '120px';
+    spinner.style.height = '120px';
+    spinner.style.animation = 'spin 2s linear infinite';
+
+    overlay.appendChild(spinner);
+    document.body.appendChild(overlay);
+
+    // Add spinner animation
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `;
+    document.head.appendChild(style);
+  };
+
+  // Remove loading overlay
+  const removeLoadingOverlay = () => {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+      overlay.remove();
+    }
+  };
+
+async function readImage(srcUrl){
+  const captioner = await pipeline('image-to-text', 'Xenova/vit-gpt2-image-captioning');
+  createLoadingOverlay();
+  const description = await captioner(srcUrl).then((response) => {
+    removeLoadingOverlay();
+    const utterance = new SpeechSynthesisUtterance(response[0].generated_text);
+    speechSynthesis.speak(utterance);
+});
 }
 
 function openMagnifiedImage(imageSrc) {

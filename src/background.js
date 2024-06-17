@@ -29,6 +29,12 @@ chrome.runtime.onInstalled.addListener(() => {
         title: 'Magnify',
         contexts: ['image'],
       });
+
+      chrome.contextMenus.create({
+        id: 'read-image',
+        title: 'Describe',
+        contexts: ['image'],
+});
 });
 
 // Handle context menu item clicks
@@ -87,6 +93,12 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
       else if (info.menuItemId === 'magnify-image') {
         chrome.tabs.sendMessage(tab.id, {
           action: 'openMagnifiedImage',
+          srcUrl: info.srcUrl
+        });
+      }
+      else if (info.menuItemId === 'read-image') {
+        chrome.tabs.sendMessage(tab.id, {
+          action: 'readImage',
           srcUrl: info.srcUrl
         });
       }
