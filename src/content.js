@@ -50,6 +50,9 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     case "applyFocusedReading":
       applyFocusedReadingToSelection();
       break;
+    case "summarizeSelection":
+      summarizeSelection();
+      break;
     case "openMagnifiedImage":
       openMagnifiedImage(request.srcUrl);
       break;
@@ -545,6 +548,53 @@ function splitWord(word) {
   return [word.substring(0, splitIndex), word.substring(splitIndex)];
 }
 
+function summarizeSelection(){
+  createLoadingOverlay();
+  const selection = window.getSelection();
+  if (!selection.rangeCount) return;
+  const range = selection.getRangeAt(0);
+  if (!range.collapsed) {
+    summarizeText(range.toString());
+  }
+}
+
+async function summarizeText(txt){
+  const summarizer = await pipeline('summarization', 'Xenova/distilbart-cnn-6-6');
+  await summarizer(txt).then((response) => {
+    const selectedText = "Summary: " + response[0].summary_text;
+    removeLoadingOverlay();
+    createPopup(selectedText)
+  });
+}
+
+function createPopup(summary) {
+  const popup = document.createElement('div');
+  popup.style.position = 'fixed';
+  popup.style.bottom = '10px';
+  popup.style.right = '10px';
+  popup.style.backgroundColor = '#fff';
+  popup.style.padding = '10px';
+  popup.style.border = '1px solid #000';
+  popup.style.zIndex = '1000';
+  popup.style.fontWeight = "5"
+  popup.textContent = summary;
+
+  document.body.appendChild(popup);
+
+  // Function to remove the popup
+  function removePopup(event) {
+    if (!popup.contains(event.target)) {
+      document.body.removeChild(popup);
+      document.removeEventListener('click', removePopup);
+    }
+  }
+
+  // Add an event listener to detect clicks outside the popup
+  setTimeout(() => {
+    document.addEventListener('click', removePopup);
+  }, 0);
+}
+
   // Add loading overlay
   const createLoadingOverlay = () => {
     const overlay = document.createElement('div');
@@ -595,8 +645,7 @@ async function readImage(srcUrl){
   createLoadingOverlay();
   const description = await captioner(srcUrl).then((response) => {
     removeLoadingOverlay();
-    const utterance = new SpeechSynthesisUtterance(response[0].generated_text);
-    speechSynthesis.speak(utterance);
+    createPopup("Image Details: " + response[0].generated_text);
 });
 }
 

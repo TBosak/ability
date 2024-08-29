@@ -25,6 +25,12 @@ chrome.runtime.onInstalled.addListener(() => {
       });
 
       chrome.contextMenus.create({
+        id: "summarize",
+        title: "Summarize Selection",
+        contexts: ["selection"],
+      });
+
+      chrome.contextMenus.create({
         id: 'magnify-image',
         title: 'Magnify',
         contexts: ['image'],
@@ -88,6 +94,10 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     } else if (info.menuItemId === 'focused-reading') {
         chrome.tabs.sendMessage(tab.id, {
           action: 'applyFocusedReading'
+        });
+    } else if (info.menuItemId === 'summarize') {
+        chrome.tabs.sendMessage(tab.id, {
+          action: 'summarizeSelection'
         });
       }
       else if (info.menuItemId === 'magnify-image') {
