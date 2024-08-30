@@ -571,12 +571,14 @@ function createPopup(summary) {
   const popup = document.createElement('div');
   popup.style.position = 'fixed';
   popup.style.bottom = '10px';
-  popup.style.right = '10px';
+  popup.style.left = '50%';
+  popup.style.transform = 'translateX(-50%)';
   popup.style.backgroundColor = '#fff';
   popup.style.padding = '10px';
   popup.style.border = '1px solid #000';
   popup.style.zIndex = '1000';
-  popup.style.fontWeight = "5"
+  popup.style.maxWidth = '100vw';
+  popup.style.overflowY = 'scroll';
   popup.textContent = summary;
 
   document.body.appendChild(popup);
@@ -641,12 +643,12 @@ function createPopup(summary) {
   };
 
 async function readImage(srcUrl){
-  const captioner = await pipeline('image-to-text', 'Xenova/vit-gpt2-image-captioning');
   createLoadingOverlay();
-  const description = await captioner(srcUrl).then((response) => {
+  const captioner = await pipeline('image-to-text', 'Xenova/vit-gpt2-image-captioning');
+  await captioner(srcUrl).then((res)=>{
     removeLoadingOverlay();
-    createPopup("Image Details: " + response[0].generated_text);
-});
+    createPopup("Image Details: " + res[0].generated_text);
+  });
 }
 
 function openMagnifiedImage(imageSrc) {
