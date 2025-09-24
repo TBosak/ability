@@ -1,22 +1,43 @@
 {
   "name": "ability",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Ability is a Chrome extension designed to enhance web accessibility for users with different needs. It is a comprehensive collection of assistive tools, providing a range of features including text-to-speech, speech-to-text, image hiding, high contrast mode, dyslexia-friendly font injection, etc. This collection of tools was designed keeping in mind individuals with sensory sensitivities, dyslexia, epilepsy, visual & mobility impairments, and intellectual disabilities. The features will continue to grow as more needs are discovered. See the list of upcoming features for a look at what's coming down the pipeline.",
   "main": "background.js",
   "type": "module",
   "scripts": {
-    "build": "webpack",
-    "dev": "webpack --watch"
+    "build": "npm run build:extension && npm run build:popup",
+    "build:extension": "webpack --mode=production",
+    "build:popup": "vite build --config popup/vite.config.js",
+    "dev": "npm run dev:extension",
+    "dev:extension": "webpack --watch --mode=development",
+    "dev:popup": "vite build --watch --config popup/vite.config.js",
+    "preview:popup": "vite preview --config popup/vite.config.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.17",
     "copy-webpack-plugin": "^11.0.0",
-    "html-webpack-plugin": "^5.5.1",
+    "postcss": "^8.4.33",
+    "tailwindcss": "^3.4.4",
+    "tailwindcss-animate": "^1.0.7",
+    "vite": "^5.2.0",
     "webpack": "^5.79.0",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "@xenova/transformers": "^2.0.0"
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-slider": "^1.0.2",
+    "@radix-ui/react-slot": "^1.0.2",
+    "@radix-ui/react-switch": "^1.0.3",
+    "@xenova/transformers": "^2.0.0",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.0",
+    "lucide-react": "^0.378.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "tailwind-merge": "^2.2.1"
   }
 }

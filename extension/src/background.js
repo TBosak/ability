@@ -1,5 +1,5 @@
 // Create context menu items
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener((details) => {
     chrome.contextMenus.create({
         id: "speak-selected-text",
         title: "Speak Selection",
@@ -38,9 +38,24 @@ chrome.runtime.onInstalled.addListener(() => {
 
       chrome.contextMenus.create({
         id: 'read-image',
-        title: 'Describe',
-        contexts: ['image'],
+      title: 'Describe',
+      contexts: ['image'],
 });
+
+    if (details?.reason === 'install') {
+        const iconUrl = chrome.runtime.getURL('assets/128.png');
+        chrome.notifications?.create('ability-install-restart', {
+            type: 'basic',
+            iconUrl,
+            title: 'Ability is ready',
+            message: 'If any features seem inactive, restart Chrome to finish enabling the extension.',
+            requireInteraction: true
+        }, () => {
+            if (chrome.runtime.lastError) {
+                console.warn('Install notification failed:', chrome.runtime.lastError.message);
+            }
+        });
+    }
 });
 
 // Handle context menu item clicks
